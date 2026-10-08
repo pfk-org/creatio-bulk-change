@@ -127,6 +127,7 @@ The package has no C# code, so no compilation is needed after installation. Hard
 ## Roadmap
 
 - Several fields in one run (`+` adds another field row).
+- Change log.
 
 ## License
 
