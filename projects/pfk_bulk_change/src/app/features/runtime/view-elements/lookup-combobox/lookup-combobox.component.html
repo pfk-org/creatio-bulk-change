@@ -1,0 +1,46 @@
+<div class="combobox">
+  <input
+    class="control"
+    type="text"
+    role="combobox"
+    autocomplete="off"
+    aria-autocomplete="list"
+    [id]="inputId"
+    [value]="searchText()"
+    [disabled]="isDisabled"
+    [attr.aria-disabled]="isDisabled"
+    [attr.aria-expanded]="isOpen()"
+    [attr.aria-controls]="listboxId"
+    [attr.aria-activedescendant]="isOpen() && activeIndex() >= 0 ? optionId(activeIndex()) : null"
+    [placeholder]="placeholder || strings.lookupPlaceholder"
+    (input)="onInput($event)"
+    (focus)="onFocus()"
+    (blur)="onBlur()"
+    (keydown)="onKeydown($event)"
+  />
+  @if (isOpen()) {
+    <ul class="listbox" role="listbox" [id]="listboxId">
+      @if (isLoading()) {
+        <li class="hint" role="presentation" aria-live="polite">{{ strings.lookupLoading }}</li>
+      } @else if (errorMessage()) {
+        <li class="hint hint--error" role="presentation" aria-live="assertive">{{ errorMessage() }}</li>
+      } @else {
+        @for (option of options(); track option.value; let index = $index) {
+          <li
+            class="option"
+            role="option"
+            [id]="optionId(index)"
+            [class.option--active]="index === activeIndex()"
+            [attr.aria-selected]="selected()?.value === option.value"
+            (mousedown)="$event.preventDefault()"
+            (click)="select(option)"
+          >
+            {{ option.displayValue }}
+          </li>
+        } @empty {
+          <li class="hint" role="presentation" aria-live="polite">{{ strings.lookupNoResults }}</li>
+        }
+      }
+    </ul>
+  }
+</div>

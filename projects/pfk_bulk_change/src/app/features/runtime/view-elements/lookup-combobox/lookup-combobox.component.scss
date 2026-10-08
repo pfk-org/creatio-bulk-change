@@ -1,0 +1,44 @@
+@use '../../../../shared/styles/tokens' as *;
+
+.control {
+  @include text-control;
+}
+
+// The list is part of the layout (not an overlay), so the dialog grows instead of clipping it.
+.listbox {
+  max-height: 240px;
+  margin: var(--crt-spacing-50, 2px) 0 0;
+  padding: var(--crt-spacing-100, 4px) 0;
+  overflow-y: auto;
+  list-style: none;
+  background: var(--crt-color-background-base, var(--crt-color-base-light, #ffffff));
+  border: 1px solid var(--crt-color-border-base, var(--crt-palette-neutral-100, #dfdfdf));
+  border-radius: var(--crt-radius-100, 4px);
+  box-shadow: 0 2px 8px var(--crt-color-shadow, rgb(24 24 24 / 10%));
+}
+
+.option,
+.hint {
+  padding: var(--crt-spacing-150, 6px) var(--crt-spacing-300, 12px);
+}
+
+.option {
+  cursor: pointer;
+
+  &:hover,
+  &--active {
+    background: var(--crt-color-background-interaction-hover, var(--crt-palette-primary-25, #eff4fb));
+  }
+
+  &[aria-selected='true'] {
+    background: var(--crt-color-background-interaction-selected, var(--crt-palette-primary-50, #e3ebfa));
+  }
+}
+
+.hint {
+  color: var(--crt-color-text-muted, var(--crt-palette-neutral-600, #606060));
+
+  &--error {
+    color: var(--crt-color-text-error, var(--crt-palette-error-500, #d2310d));
+  }
+}

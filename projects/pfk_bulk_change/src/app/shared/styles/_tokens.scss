@@ -1,0 +1,116 @@
+// Creatio design-token mixins shared by the runtime components.
+// Every value is a --crt-* token with the default-theme fallback from DESIGN_TOKENS_AI_GUIDE.md,
+// so the components follow the active theme.
+
+@mixin typography($role, $size, $weight, $line-height, $family: 'Montserrat, sans-serif') {
+  font-family: var(--crt-#{$role}-font-family, #{$family});
+  font-size: var(--crt-#{$role}-font-size, #{$size});
+  font-weight: var(--crt-#{$role}-font-weight, #{$weight});
+  line-height: var(--crt-#{$role}-line-height, #{$line-height});
+  letter-spacing: var(--crt-#{$role}-letter-spacing, 0);
+}
+
+@mixin body-2 {
+  @include typography(body-2, 13px, 500, 20px);
+}
+
+@mixin caption {
+  @include typography(caption, 12px, 500, 16px);
+}
+
+@mixin button-text {
+  @include typography(button, 14px, 500, 16px);
+}
+
+@mixin headline-4 {
+  @include typography(headline-4, 16px, 500, 20px);
+}
+
+@mixin focus-ring {
+  outline: 2px solid var(--crt-color-border-selected, var(--crt-palette-primary-500, #004fd6));
+  outline-offset: 1px;
+}
+
+@mixin text-control {
+  @include body-2;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 32px;
+  padding: var(--crt-spacing-150, 6px) var(--crt-spacing-250, 10px);
+  color: var(--crt-color-text-body, var(--crt-color-base-dark, #181818));
+  background: var(--crt-color-background-base, var(--crt-color-base-light, #ffffff));
+  border: 1px solid var(--crt-color-border-base, var(--crt-palette-neutral-100, #dfdfdf));
+  border-radius: var(--crt-radius-100, 4px);
+  transition: border-color 0.15s ease;
+
+  &:hover:not(:disabled) {
+    border-color: var(--crt-color-border-primary-soft, var(--crt-palette-primary-200, #9bbaf2));
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+    border-color: var(--crt-color-border-selected, var(--crt-palette-primary-500, #004fd6));
+  }
+
+  &:disabled {
+    color: var(--crt-color-text-disabled, var(--crt-palette-neutral-500, #757575));
+    background: var(--crt-color-background-disabled-subtle, var(--crt-palette-neutral-50, #ededed));
+    border-color: var(--crt-color-border-disabled, var(--crt-palette-neutral-100, #dfdfdf));
+  }
+
+  &[aria-invalid='true'] {
+    border-color: var(--crt-color-border-error, var(--crt-palette-error-500, #d2310d));
+  }
+}
+
+@mixin button-base {
+  @include button-text;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--crt-spacing-200, 8px);
+  min-height: 32px;
+  padding: var(--crt-spacing-200, 8px) var(--crt-spacing-400, 16px);
+  border: 1px solid transparent;
+  border-radius: var(--crt-radius-100, 4px);
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    color: var(--crt-color-text-disabled, var(--crt-palette-neutral-500, #757575));
+    background: var(--crt-color-background-disabled-soft, var(--crt-palette-neutral-200, #c4c4c4));
+    border-color: transparent;
+  }
+}
+
+@mixin button-primary {
+  @include button-base;
+  color: var(--crt-color-text-on-primary, var(--crt-color-base-light, #ffffff));
+  background: var(--crt-color-background-primary, var(--crt-palette-primary-500, #004fd6));
+
+  &:hover:not(:disabled) {
+    background: var(--crt-color-background-primary-hover, var(--crt-palette-primary-600, #0041b5));
+  }
+
+  &:active:not(:disabled) {
+    background: var(--crt-color-background-primary-selected, var(--crt-palette-primary-700, #003495));
+  }
+}
+
+@mixin button-secondary {
+  @include button-base;
+  color: var(--crt-color-text-on-primary-soft, var(--crt-palette-primary-900, #001c5a));
+  background: var(--crt-color-background-primary-soft, var(--crt-palette-primary-50, #e3ebfa));
+
+  &:hover:not(:disabled) {
+    background: var(--crt-color-background-primary-soft-hover, var(--crt-palette-primary-100, #cbdbf8));
+  }
+
+  &:active:not(:disabled) {
+    background: var(--crt-color-background-primary-soft-selected, var(--crt-palette-primary-200, #9bbaf2));
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "PackageData": [
+    {
+      "Row": [
+        {
+          "SchemaColumnUId": "e1f978af-3b07-4c9f-a422-c6170cd1b1a4",
+          "Value": true
+        },
+        {
+          "SchemaColumnUId": "ae0e45ca-c495-4fe7-a39d-3ab7278e1617",
+          "Value": "7c8afdb6-494d-4582-97ce-01e42bb67fc6"
+        },
+        {
+          "SchemaColumnUId": "9d032101-3db5-4bba-ab16-294104cd15ad",
+          "Value": 0
+        },
+        {
+          "SchemaColumnUId": "a64eb826-4dc1-45fb-a5ac-d768275eb719",
+          "Value": "4c0452b0-42ea-46a9-8219-3c2f77fce7f5",
+          "DisplayValue": "Can use bulk change of list records"
+        },
+        {
+          "SchemaColumnUId": "423b165f-9759-437b-b532-95ef1b78063b",
+          "Value": "83a43ebc-f36b-1410-298d-001e8c82bcad",
+          "DisplayValue": "System administrators"
+        }
+      ]
+    }
+  ]
+}

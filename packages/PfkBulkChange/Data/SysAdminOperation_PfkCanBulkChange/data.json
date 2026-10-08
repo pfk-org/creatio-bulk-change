@@ -1,0 +1,16 @@
+{
+  "PackageData": [
+    {
+      "Row": [
+        {
+          "SchemaColumnUId": "2aec9cef-232e-413a-9a5a-9ddde2e8a2af",
+          "Value": "PfkCanBulkChange"
+        },
+        {
+          "SchemaColumnUId": "ae0e45ca-c495-4fe7-a39d-3ab7278e1617",
+          "Value": "4c0452b0-42ea-46a9-8219-3c2f77fce7f5"
+        }
+      ]
+    }
+  ]
+}

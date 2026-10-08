@@ -1,0 +1,11 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="Release" />
+    <BuildType Name="dev-n8" />
+    <BuildType Name="dev-nf" />
+  </Configurations>
+  <Project Path="projects\pfk_bulk_change\pfk_bulk_change.esproj">
+    <Build />
+  </Project>
+</Solution>

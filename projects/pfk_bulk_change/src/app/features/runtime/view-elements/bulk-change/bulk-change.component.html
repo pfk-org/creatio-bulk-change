@@ -1,0 +1,240 @@
+@let s = strings();
+
+<div class="bulk-change">
+  <button
+    #openButton
+    type="button"
+    class="open-button"
+    data-testid="open-button"
+    aria-haspopup="dialog"
+    [disabled]="!canOpen()"
+    [attr.aria-disabled]="!canOpen()"
+    [attr.aria-expanded]="isDialogOpen()"
+    [attr.aria-describedby]="disabledReason() ? ids.hint : null"
+    (click)="openDialog()"
+  >
+    <svg class="open-button__icon" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+      <path d="M2 11.5V14h2.5l7.4-7.4-2.5-2.5L2 11.5Zm11.8-6.8a.7.7 0 0 0 0-1L12.3 2.2a.7.7 0 0 0-1 0l-1.1 1.1 2.5 2.5 1.1-1.1Z" fill="currentColor" />
+    </svg>
+    <span data-testid="open-button-caption">{{ buttonCaption() }}</span>
+    <span class="open-button__badge" data-testid="selected-count" aria-hidden="true">{{ selectedCountLabel() }}</span>
+    <span class="visually-hidden">{{ format(s.selectedCountLabel, { count: selectedCountLabel() }) }}</span>
+  </button>
+  <span class="visually-hidden" data-testid="disabled-reason" [id]="ids.hint">{{ disabledReason() }}</span>
+</div>
+
+@if (isDialogOpen()) {
+  <div class="backdrop" data-testid="backdrop"></div>
+  <div
+    #dialog
+    class="dialog"
+    role="dialog"
+    aria-modal="true"
+    data-testid="dialog"
+    [attr.aria-labelledby]="ids.title"
+    [attr.aria-busy]="step() === 'counting'"
+    (keydown)="onDialogKeydown($event)"
+  >
+    <header class="dialog__header">
+      <h2 class="dialog__title" [id]="ids.title">{{ s.dialogTitle }}</h2>
+      <button
+        type="button"
+        class="icon-button"
+        [attr.aria-label]="s.close"
+        [disabled]="step() === 'counting'"
+        (click)="closeDialog()"
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+          <path d="M3.5 3.5l9 9m0-9l-9 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+        </svg>
+      </button>
+    </header>
+
+    <div class="dialog__body">
+      @switch (step()) {
+        @case ('form') {
+          @if (loadError()) {
+            <p class="message message--error" role="alert">{{ loadError() }}</p>
+          } @else if (!editableColumns().length) {
+            <p class="message" role="status" data-testid="no-columns">{{ s.noEditableColumns }}</p>
+          } @else {
+            <div class="field">
+              <label class="field__label" [for]="ids.field">{{ s.fieldLabel }}</label>
+              <pfk-lookup-combobox
+                data-testid="field-select"
+                [inputId]="ids.field"
+                [staticOptions]="fieldOptions()"
+                [placeholder]="s.fieldPlaceholder"
+                [strings]="s"
+                (selectedValueChange)="onFieldChange($event)"
+              ></pfk-lookup-combobox>
+            </div>
+
+            <!-- One-item loop recreates the value editor when the field changes, so no stale value is kept. -->
+            @for (column of selectedColumnAsList(); track column.name) {
+              <div class="field">
+                <label class="field__label" [for]="ids.value">{{ s.valueLabel }}</label>
+                @switch (column.editor) {
+                  @case (ValueEditorKind.Lookup) {
+                    <pfk-lookup-combobox
+                      data-testid="value-lookup"
+                      [inputId]="ids.value"
+                      [referenceSchemaName]="column.referenceSchemaName ?? ''"
+                      [isDisabled]="clearValue()"
+                      [strings]="s"
+                      (selectedValueChange)="onLookupValueChange($event)"
+                    ></pfk-lookup-combobox>
+                  }
+                  @case (ValueEditorKind.LongText) {
+                    <textarea
+                      class="control control--multiline"
+                      autocomplete="off"
+                      data-testid="value-input"
+                      rows="4"
+                      [id]="ids.value"
+                      [disabled]="clearValue()"
+                      [attr.aria-invalid]="validationError() ? true : null"
+                      [attr.aria-describedby]="validationError() ? ids.error : null"
+                      (input)="onRawValueInput($event)"
+                    ></textarea>
+                  }
+                  @case (ValueEditorKind.Boolean) {
+                    <select class="control" data-testid="value-input" [id]="ids.value" (change)="onRawValueInput($event)">
+                      <option value="true" selected>{{ s.booleanTrue }}</option>
+                      <option value="false">{{ s.booleanFalse }}</option>
+                    </select>
+                  }
+                  @default {
+                    <input
+                      class="control"
+                      data-testid="value-input"
+                      autocomplete="off"
+                      [id]="ids.value"
+                      [type]="inputType(column.editor)"
+                      [attr.step]="column.editor === ValueEditorKind.Integer ? 1 : column.editor === ValueEditorKind.Decimal ? 'any' : null"
+                      [disabled]="clearValue()"
+                      [attr.aria-invalid]="validationError() ? true : null"
+                      [attr.aria-describedby]="validationError() ? ids.error : null"
+                      (input)="onRawValueInput($event)"
+                    />
+                  }
+                }
+              </div>
+
+              @if (column.editor !== ValueEditorKind.Boolean) {
+                <label class="checkbox" [for]="ids.clear">
+                  <input
+                    type="checkbox"
+                    data-testid="clear-value"
+                    [id]="ids.clear"
+                    [checked]="clearValue()"
+                    [disabled]="column.isRequired"
+                    [attr.aria-describedby]="column.isRequired ? ids.clear + '-hint' : null"
+                    (change)="onClearValueChange($event)"
+                  />
+                  <span>{{ s.clearValue }}</span>
+                </label>
+                @if (column.isRequired) {
+                  <span class="hint" [id]="ids.clear + '-hint'">{{ s.requiredCannotBeCleared }}</span>
+                }
+              }
+            }
+          }
+          @if (validationError()) {
+            <p class="message message--error" role="alert" data-testid="validation-error" [id]="ids.error">
+              <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                <circle cx="8" cy="8" r="7" fill="currentColor" />
+                <path d="M8 4.5v4.2M8 10.8v.7" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+              </svg>
+              {{ validationError() }}
+            </p>
+          }
+        }
+
+        @case ('counting') {
+          <p class="message" role="status" aria-live="polite">{{ s.countingRecords }}</p>
+        }
+
+        @case ('confirm') {
+          @let summary = confirmation();
+          <section class="summary" role="status" aria-live="polite" data-testid="confirm-message">
+            <div class="summary__count">
+              <span class="summary__count-number" data-testid="confirm-count">{{ summary.count }}</span>
+              <span class="summary__count-label">{{ s.confirmCountLabel }}</span>
+            </div>
+            <dl class="summary__change">
+              <div class="summary__item">
+                <dt class="summary__label">{{ s.confirmFieldLabel }}</dt>
+                <dd class="summary__field" data-testid="confirm-field">{{ summary.field }}</dd>
+              </div>
+              <svg class="summary__arrow" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                <path d="M4 10h11m-4-4 4 4-4 4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              <div class="summary__item">
+                <dt class="summary__label">{{ s.confirmValueLabel }}</dt>
+                <dd class="summary__value" data-testid="confirm-value">
+                  <span class="chip" [class.chip--empty]="summary.isCleared">{{ summary.value }}</span>
+                </dd>
+              </div>
+            </dl>
+            <p class="summary__note">
+              <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3" fill="none" />
+                <path d="M8 7.2v3.6M8 5v.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+              </svg>
+              {{ s.confirmNote }}
+            </p>
+          </section>
+        }
+
+        @case ('done') {
+          @if (result(); as r) {
+            <div role="status" aria-live="polite" data-testid="result">
+              <p class="message message--success">
+                <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                  <circle cx="8" cy="8" r="7" fill="currentColor" />
+                  <path d="M4.8 8.2l2.1 2.1 4.3-4.6" stroke="#ffffff" stroke-width="1.5" fill="none" stroke-linecap="round" />
+                </svg>
+                {{ s.resultDone }}. {{ format(s.resultUpdated, { count: r.updated }) }}
+              </p>
+              @if (r.failed) {
+                <p class="message message--error">{{ format(s.resultFailed, { count: r.failed }) }}</p>
+                <h3 class="errors-title">{{ s.errorsTitle }}</h3>
+                <ul class="errors">
+                  @for (error of r.errors; track $index) {
+                    <li>{{ error }}</li>
+                  }
+                </ul>
+              }
+            </div>
+          }
+        }
+      }
+    </div>
+
+    <footer class="dialog__footer">
+      @switch (step()) {
+        @case ('form') {
+          <button type="button" class="button button--secondary" (click)="closeDialog()">{{ s.cancel }}</button>
+          <button
+            type="button"
+            class="button button--primary"
+            data-testid="apply-button"
+            [disabled]="!selectedColumn()"
+            [attr.aria-disabled]="!selectedColumn()"
+            (click)="prepare()"
+          >
+            {{ s.apply }}
+          </button>
+        }
+        @case ('confirm') {
+          <button type="button" class="button button--secondary" (click)="backToForm()">{{ s.cancel }}</button>
+          <button type="button" class="button button--primary" data-testid="confirm-button" (click)="run()">{{ format(s.confirmYes, { count: recordIds().length }) }}</button>
+        }
+        @case ('done') {
+          <button type="button" class="button button--primary" data-testid="close-button" (click)="closeDialog()">{{ s.close }}</button>
+        }
+      }
+    </footer>
+  </div>
+}

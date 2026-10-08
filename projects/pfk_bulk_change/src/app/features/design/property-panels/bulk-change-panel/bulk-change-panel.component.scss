@@ -1,0 +1,280 @@
+@use '@creatio/interface-designer/styles/properties-panel-styles';
+
+// Layout of the out-of-the-box panels (measured on the Search panel): collapsible sections with an
+// uppercase title, fields with the label above, a dotted underline, the dropdown arrow on hover and
+// an (i) hint at the end of the field row.
+crt-interface-designer-properties-panel-wrapper {
+  --pfk-panel-gutter: var(--crt-size-s, 16px);
+  --pfk-panel-text: var(--crt-base-input-text-color, rgb(24, 24, 24));
+  --pfk-panel-accent: var(--crt-color-primary-dark, rgb(13, 46, 78));
+  --pfk-panel-muted-icon: var(--crt-color-gray-neutral, rgb(117, 117, 117));
+
+  .pfk-section__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: var(--crt-size-xl, 48px);
+    padding: 0 var(--pfk-panel-gutter);
+    border: none;
+    background: transparent;
+    color: var(--pfk-panel-accent);
+    cursor: pointer;
+    text-align: left;
+
+    &:focus-visible {
+      outline: 2px solid var(--crt-palette-primary-500, rgb(0, 79, 214));
+      outline-offset: -2px;
+    }
+
+    &[aria-expanded='false'] .pfk-section__chevron {
+      transform: rotate(180deg);
+    }
+  }
+
+  .pfk-section__title {
+    font-family: var(--crt-body-2-font-family);
+    font-size: 14px;
+    font-weight: var(--crt-font-weight-medium, 500);
+    line-height: var(--crt-line-height-s, 18px);
+    text-transform: uppercase;
+  }
+
+  .pfk-section__chevron {
+    flex: none;
+    transition: transform var(--crt-transition-duration, 0.2s);
+  }
+
+  .pfk-section__body {
+    padding: var(--crt-size-2xs, 8px) var(--pfk-panel-gutter) 0;
+  }
+
+  .pfk-field {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding-bottom: var(--crt-size-s, 16px);
+  }
+
+  .pfk-field__label {
+    display: block;
+    min-height: var(--crt-line-height-xs, 16px);
+    margin: 0 0 var(--crt-label-margin-bottom, 8px);
+    overflow: hidden;
+    font-family: var(--crt-body-2-font-family);
+    font-size: var(--crt-caption-font-size, 12px);
+    font-weight: var(--crt-font-weight-medium, 500);
+    line-height: var(--crt-line-height-xs, 16px);
+    color: var(--crt-color-text-muted);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    &--sub {
+      margin-top: var(--crt-size-xs, 12px);
+    }
+  }
+
+  .pfk-field__row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--crt-size-3xs, 4px);
+    min-width: 0;
+    border-bottom: 1px dotted var(--crt-color-border-base, rgb(223, 223, 223));
+    transition: border-color var(--crt-transition-duration, 0.2s);
+
+    &:focus-within {
+      border-bottom: 1px solid var(--pfk-panel-accent);
+    }
+  }
+
+  .pfk-field__control {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+    height: var(--crt-size-m, 24px);
+    padding: 0 0 var(--crt-size-3xs, 4px);
+    border: none;
+    background: transparent;
+    color: var(--pfk-panel-text);
+    font-family: var(--crt-body-2-font-family);
+    font-size: var(--crt-body-2-font-size, 13px);
+    font-weight: var(--crt-font-weight-medium, 500);
+    line-height: var(--crt-line-height-m, 20px);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+
+    &:focus {
+      outline: none;
+    }
+
+    &::placeholder {
+      color: var(--crt-color-gray-light, rgb(186, 186, 186));
+    }
+
+    &[readonly] {
+      cursor: default;
+    }
+
+  }
+
+  // List dropdown (measured on the out-of-the-box combobox): white list with a 1px border and a soft
+  // shadow right under the field, 40px options with the active one on a light blue background.
+  .pfk-combobox__value {
+    display: block;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .pfk-combobox__arrow {
+    flex: none;
+    box-sizing: content-box;
+    padding: 2px;
+    margin-bottom: var(--crt-size-3xs, 4px);
+    color: var(--crt-color-text-muted);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity var(--crt-transition-duration, 0.2s), color var(--crt-transition-duration, 0.2s);
+  }
+
+  .pfk-combobox:hover .pfk-combobox__arrow,
+  .pfk-combobox:focus-within .pfk-combobox__arrow,
+  .pfk-combobox--open .pfk-combobox__arrow {
+    opacity: 1;
+  }
+
+  .pfk-combobox--open .pfk-combobox__arrow {
+    color: var(--crt-palette-primary-500, rgb(0, 78, 224));
+  }
+
+  .pfk-combobox__list {
+    position: absolute;
+    top: calc(100% + 2px);
+    left: 0;
+    right: 0;
+    z-index: 20;
+    box-sizing: border-box;
+    max-height: 256px;
+    margin: 0;
+    padding: 1px;
+    overflow-y: auto;
+    list-style: none;
+    border: 1px solid var(--crt-color-border-base, rgb(223, 223, 223));
+    border-radius: 0 0 3px 3px;
+    background: var(--crt-color-white, white);
+    box-shadow: 0 2px 4px rgba(24, 24, 24, 0.1);
+  }
+
+  .pfk-combobox__option {
+    display: flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 0 var(--crt-size-s, 16px);
+    border-radius: 4px;
+    color: var(--pfk-panel-text);
+    font-family: var(--crt-body-2-font-family);
+    font-size: var(--crt-body-2-font-size, 13px);
+    font-weight: var(--crt-font-weight-medium, 500);
+    line-height: var(--crt-line-height-m, 20px);
+    cursor: pointer;
+
+    &--active,
+    &[aria-selected='true'] {
+      background: var(--crt-color-selected-bg, rgb(227, 235, 250));
+    }
+  }
+
+  .pfk-field__lock {
+    flex: none;
+    color: var(--pfk-panel-muted-icon);
+    opacity: 0;
+    transition: opacity var(--crt-transition-duration, 0.2s);
+  }
+
+  .pfk-field__row:hover .pfk-field__lock,
+  .pfk-field__row:focus-within .pfk-field__lock {
+    opacity: 1;
+  }
+
+  .pfk-field__status {
+    margin-top: var(--crt-size-3xs, 4px);
+    font-family: var(--crt-body-2-font-family);
+    font-size: var(--crt-caption-font-size, 12px);
+    font-weight: var(--crt-font-weight-medium, 500);
+    line-height: var(--crt-line-height-xs, 16px);
+    color: var(--crt-color-text-muted);
+
+    &:empty {
+      display: none;
+    }
+
+    &--error {
+      color: var(--crt-color-text-error, var(--crt-palette-error-500, rgb(210, 49, 13)));
+    }
+  }
+
+  .pfk-info {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+  }
+
+  .pfk-info__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    margin: 0 2px var(--crt-size-3xs, 4px);
+    padding: 2px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--pfk-panel-accent);
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid var(--crt-palette-primary-500, rgb(0, 79, 214));
+      outline-offset: 0;
+    }
+  }
+
+  .pfk-info__tooltip {
+    position: absolute;
+    top: calc(100% + 2px);
+    right: 0;
+    z-index: 10;
+    width: max-content;
+    max-width: 240px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    background: var(--pfk-panel-accent);
+    color: var(--crt-color-white, white);
+    font-family: var(--crt-body-2-font-family);
+    font-size: var(--crt-caption-font-size, 12px);
+    font-weight: var(--crt-font-weight-medium, 500);
+    line-height: var(--crt-line-height-xs, 16px);
+    white-space: normal;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--crt-transition-duration, 0.2s);
+  }
+
+  .pfk-info:hover .pfk-info__tooltip,
+  .pfk-info:focus-within .pfk-info__tooltip {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pfk-section__chevron,
+    .pfk-field__row,
+    .pfk-field__lock,
+    .pfk-combobox__arrow,
+    .pfk-info__tooltip {
+      transition: none;
+    }
+  }
+}

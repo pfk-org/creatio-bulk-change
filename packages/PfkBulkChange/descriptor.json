@@ -1,0 +1,19 @@
+{
+  "Descriptor": {
+    "UId": "01c290e3-a397-4e90-a650-88fea3ba75ed",
+    "PackageVersion": "0.1.0",
+    "Name": "PfkBulkChange",
+    "Type": 1,
+    "ModifiedOnUtc": "/Date(1790858255000)/",
+    "Maintainer": "Customer",
+    "InstallBehavior": 1,
+    "DependsOn": [
+      {
+        "UId": "3a71e376-9ac3-3049-c62b-9c43b9abe054",
+        "PackageVersion": "7.8.0",
+        "Name": "CrtCoreBase",
+        "Type": 1
+      }
+    ]
+  }
+}

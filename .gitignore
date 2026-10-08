@@ -1,0 +1,30 @@
+**/.vscode
+**/.vs
+**/.idea
+
+**/.application
+**/.solution
+**/.nuget
+**/*.user
+
+**/[O-o]bj
+**/[B-b]in
+
+**\workspaceEnvironmentSettings.json
+
+# We only keep en-US resources
+**/resource.??-??.xml
+!**/resource.en-US.xml
+
+# We only keep en-US data
+**/data.??-??.json
+!**/data.en-US.json
+!**/data.uk-UA.json
+
+# Angular / Node
+**/node_modules
+**/.angular
+**/coverage
+# Built remote module (produced by `npm run build`)
+packages/PfkBulkChange/Files/src/js/pfk_bulk_change/
+**/.clio-pages

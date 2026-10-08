@@ -1,0 +1,8 @@
+{
+  "Packages": [
+    "PfkBulkChange"
+  ],
+  "ApplicationVersion": "10.0.0.801",
+  "IgnorePackages": [],
+  "ExternalPackages": []
+}

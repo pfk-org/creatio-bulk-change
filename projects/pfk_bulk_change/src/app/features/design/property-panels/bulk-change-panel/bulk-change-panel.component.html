@@ -1,0 +1,190 @@
+@if (isPanelReady()) {
+  @let s = strings();
+  <crt-interface-designer-properties-panel-wrapper [showHeader]="true" [headerTitle]="s.panelTitle" [canShowTooltip]="true">
+    <!-- Sections, fields and hints follow the out-of-the-box panels (for example the Search panel). -->
+    <section class="pfk-section">
+      <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'general', title: s.panelSectionGeneral }"></ng-container>
+      @if (isSectionOpen('general')) {
+        <div class="pfk-section__body" [id]="ids.section + 'general'">
+          <div class="pfk-field">
+            @if (gridOptions().length) {
+              <span class="pfk-field__label" [id]="ids.grid + '-label'">{{ s.panelGridLabel }}</span>
+              <!-- ARIA combobox drawn like the out-of-the-box dropdown; a native select cannot style its list. -->
+              <div class="pfk-field__row pfk-combobox" [class.pfk-combobox--open]="isListOpen()" (focusout)="onListFocusOut($event)">
+                <button
+                  type="button"
+                  role="combobox"
+                  class="pfk-field__control pfk-combobox__value"
+                  data-testid="grid-select"
+                  aria-haspopup="listbox"
+                  [id]="ids.grid"
+                  [attr.aria-labelledby]="ids.grid + '-label'"
+                  [attr.aria-expanded]="isListOpen()"
+                  [attr.aria-controls]="ids.gridListbox"
+                  [attr.aria-activedescendant]="isListOpen() ? ids.gridOption + activeOptionIndex() : null"
+                  [attr.aria-invalid]="linkError() && !isManualEntry() ? true : null"
+                  [attr.aria-describedby]="ids.gridStatus"
+                  (click)="toggleList()"
+                  (keydown)="onListKeydown($event)"
+                >
+                  {{ selectedListCaption() }}
+                </button>
+                <svg class="pfk-combobox__arrow" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false" (click)="toggleList()">
+                  <path d="M4 7L8 11L12 7H4Z" fill="currentColor" />
+                </svg>
+                <ng-container *ngTemplateOutlet="info; context: { $implicit: 'grid', text: s.panelGridHint }"></ng-container>
+                @if (isListOpen()) {
+                  <ul class="pfk-combobox__list" role="listbox" data-testid="grid-listbox" [id]="ids.gridListbox" [attr.aria-labelledby]="ids.grid + '-label'">
+                    @for (option of listOptions(); track option.gridName; let index = $index) {
+                      <li
+                        role="option"
+                        class="pfk-combobox__option"
+                        [id]="ids.gridOption + index"
+                        [class.pfk-combobox__option--active]="index === activeOptionIndex()"
+                        [attr.aria-selected]="isOptionSelected(option)"
+                        (mousedown)="$event.preventDefault()"
+                        (mouseenter)="activeOptionIndex.set(index)"
+                        (click)="chooseList(option)"
+                      >
+                        {{ option.caption }}
+                      </li>
+                    }
+                  </ul>
+                }
+              </div>
+            }
+            @if (!gridOptions().length || isManualEntry()) {
+              <!-- No list was discovered on the page, or the user enters another list code. -->
+              <label class="pfk-field__label" [class.pfk-field__label--sub]="gridOptions().length" [for]="ids.gridCode">{{ s.panelGridCodeLabel }}</label>
+              <div class="pfk-field__row">
+                <input
+                  type="text"
+                  class="pfk-field__control"
+                  autocomplete="off"
+                  data-testid="grid-code"
+                  placeholder="DataTable"
+                  [id]="ids.gridCode"
+                  [value]="isManualEntry() ? gridName() : ''"
+                  [attr.aria-invalid]="linkError() ? true : null"
+                  [attr.aria-describedby]="ids.gridStatus"
+                  (change)="onManualGridNameChange($event)"
+                />
+                @if (!gridOptions().length) {
+                  <ng-container *ngTemplateOutlet="info; context: { $implicit: 'grid', text: s.panelGridHint }"></ng-container>
+                }
+              </div>
+            }
+            <span
+              class="pfk-field__status"
+              aria-live="polite"
+              data-testid="grid-status"
+              [id]="ids.gridStatus"
+              [class.pfk-field__status--error]="linkError()"
+            >
+              @if (linkError()) {
+                <span aria-hidden="true">⚠</span> {{ linkError() }}
+              }
+            </span>
+          </div>
+
+          <div class="pfk-field">
+            <label class="pfk-field__label" [for]="ids.caption">{{ s.panelCaptionLabel }}</label>
+            <div class="pfk-field__row">
+              <input
+                type="text"
+                class="pfk-field__control"
+                autocomplete="off"
+                data-testid="caption"
+                [id]="ids.caption"
+                [value]="caption()"
+                [placeholder]="s.buttonCaption"
+                (input)="onCaptionInput($event)"
+              />
+            </div>
+          </div>
+        </div>
+      }
+    </section>
+
+    <section class="pfk-section">
+      <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'appearance', title: s.panelSectionAppearance }"></ng-container>
+      @if (isSectionOpen('appearance')) {
+        <div class="pfk-section__body" [id]="ids.section + 'appearance'">
+          <div class="pfk-field">
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                data-testid="visible"
+                [checked]="isVisible()"
+                [attr.aria-describedby]="visibleBinding() ? ids.visibleHint : null"
+                (change)="onVisibleChange($event)"
+              />
+              {{ s.panelVisibleLabel }}
+            </label>
+            @if (visibleBinding()) {
+              <span class="pfk-field__status" [id]="ids.visibleHint">{{ format(s.panelVisibleBound, { name: visibleBinding() }) }}</span>
+            }
+          </div>
+        </div>
+      }
+    </section>
+
+    <section class="pfk-section">
+      <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'advanced', title: s.panelSectionAdvanced }"></ng-container>
+      @if (isSectionOpen('advanced')) {
+        <div class="pfk-section__body" [id]="ids.section + 'advanced'">
+          <div class="pfk-field">
+            <label class="pfk-field__label" [for]="ids.elementCode">{{ s.panelElementCodeLabel }}</label>
+            <div class="pfk-field__row">
+              <input
+                type="text"
+                class="pfk-field__control"
+                readonly
+                data-testid="element-code"
+                [id]="ids.elementCode"
+                [value]="elementCode()"
+              />
+              <svg class="pfk-field__lock" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                <rect x="3.5" y="7" width="9" height="6.5" rx="1.5" fill="currentColor" />
+                <path d="M5.5 7V5.2a2.5 2.5 0 0 1 5 0V7" stroke="currentColor" stroke-width="1.4" fill="none" />
+              </svg>
+              <ng-container *ngTemplateOutlet="info; context: { $implicit: 'elementCode', text: s.panelElementCodeHint }"></ng-container>
+            </div>
+          </div>
+        </div>
+      }
+    </section>
+  </crt-interface-designer-properties-panel-wrapper>
+
+  <ng-template #sectionHeader let-key let-title="title">
+    <button
+      type="button"
+      class="pfk-section__header"
+      [attr.aria-expanded]="isSectionOpen(key)"
+      [attr.aria-controls]="ids.section + key"
+      (click)="toggleSection(key)"
+    >
+      <span class="pfk-section__title">{{ title }}</span>
+      <svg class="pfk-section__chevron" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+        <path d="M4 10l4-4 4 4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </button>
+  </ng-template>
+
+  <!-- (i) with a tooltip shown on hover and on keyboard focus, like the out-of-the-box field hints. -->
+  <ng-template #info let-key let-text="text">
+    <span class="pfk-info">
+      <button type="button" class="pfk-info__button" [attr.aria-label]="s.panelInfo" [attr.aria-describedby]="ids.tooltip + key">
+        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+          <path
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            fill="currentColor"
+            d="M13.16 8A5.16 5.16 0 1 0 2.84 8a5.16 5.16 0 0 0 10.32 0ZM8 1.5a6.5 6.5 0 1 1 0 13 6.5 6.5 0 0 1 0-13Zm-.84 3.9c0-.46.38-.84.84-.84a.84.84 0 1 1 0 1.67.84.84 0 0 1-.84-.83ZM8 6.95c.46 0 .83.38.83.84l-.002 2.82a.83.83 0 1 1-1.67-.003l.003-2.82c0-.46.38-.83.84-.83Z"
+          />
+        </svg>
+      </button>
+      <span class="pfk-info__tooltip" role="tooltip" [id]="ids.tooltip + key">{{ text }}</span>
+    </span>
+  </ng-template>
+}
