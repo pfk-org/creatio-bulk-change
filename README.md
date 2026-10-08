@@ -23,8 +23,7 @@ every time the dialog opens). To change another field, add its column to the lis
 
 Requirements: Creatio 10.0 with Freedom UI (built and tested on 10.0.0.801). The package has no C# code.
 
-**Ready package.** Download `PfkBulkChange.gz` (the package itself) or `PfkBulkChange.zip` (the same package in a
-zip) from the [Releases](https://github.com/pfk-org/creatio-bulk-change/releases) page and install it as a package file
+**Ready package.** Download `PfkBulkChange.gz` from the [Releases](https://github.com/pfk-org/creatio-bulk-change/releases) page and install it as a package file
 (**Application Hub → New application → Install from file**). Hard-reload the browser (Ctrl+Shift+R).
 
 **From source** with [clio](https://github.com/Advance-Technologies-Foundation/clio):
